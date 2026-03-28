@@ -1,9 +1,8 @@
 package org.example.spring_homework_003.exception;
 
 import jakarta.servlet.http.HttpServletRequest;
-import org.example.spring_homework_003.models.reponses.ApiResponse;
+import org.example.spring_homework_003.models.reponses.ErrorResponse;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -18,8 +17,8 @@ import java.util.Map;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<ApiResponse> handleResourceNotFound(ResourceNotFoundException ex, HttpServletRequest request) {
-        ApiResponse apiResponse = ApiResponse.builder()
+    public ResponseEntity<ErrorResponse> handleResourceNotFound(ResourceNotFoundException ex, HttpServletRequest request) {
+        ErrorResponse errorResponse = ErrorResponse.builder()
                 .detail(ex.getMessage())
                 .instance(request.getRequestURI())
                 .status(404)
@@ -27,22 +26,31 @@ public class GlobalExceptionHandler {
                 .type("http://localhost:8080/errors/not-found")
                 .timestamp(Instant.now())
                 .build();
-        return ResponseEntity.status(404).body(apiResponse);
+        return ResponseEntity.status(404).body(errorResponse);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Map<String, String>>handleValidationException(MethodArgumentNotValidException ex){
+    public ResponseEntity<ErrorResponse> handleValidationException(MethodArgumentNotValidException ex, HttpServletRequest request) {
         Map<String, String> errors = new HashMap<>();
 
         ex.getBindingResult().getFieldErrors().forEach(error -> {
             errors.put(error.getField(), error.getDefaultMessage());
         });
-        return ResponseEntity.badRequest().body(errors);
+
+        ErrorResponse errorResponse = ErrorResponse.builder()
+                .instance(request.getRequestURI())
+                .status(400)
+                .title("Bad Request")
+                .timestamp(Instant.now())
+                .errors(errors)
+                .build();
+
+        return ResponseEntity.badRequest().body(errorResponse);
     }
 
     @ExceptionHandler(DuplicationException.class)
-    public ResponseEntity<ApiResponse> handleDuplicationException(DuplicationException ex, HttpServletRequest request) {
-        ApiResponse apiResponse = ApiResponse.builder()
+    public ResponseEntity<ErrorResponse> handleDuplicationException(DuplicationException ex, HttpServletRequest request) {
+        ErrorResponse errorResponse = ErrorResponse.builder()
                 .detail(ex.getMessage())
                 .instance(request.getRequestURI())
                 .status(409)
@@ -50,7 +58,7 @@ public class GlobalExceptionHandler {
                 .type("http://localhost:8080/errors/duplicate-user")
                 .timestamp(Instant.now())
                 .build();
-        return ResponseEntity.status(409).body(apiResponse);
+        return ResponseEntity.status(409).body(errorResponse);
     }
 
 }

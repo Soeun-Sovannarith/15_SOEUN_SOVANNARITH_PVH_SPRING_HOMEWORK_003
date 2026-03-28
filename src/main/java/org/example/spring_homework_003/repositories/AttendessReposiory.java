@@ -26,16 +26,19 @@ public interface AttendessReposiory {
     @Select("Select * from attendees where attendee_name = #{attendeeName} LIMIT 1;")
     Attendee getAttendeeByName(String attendeeName);
 
-    @Options(useGeneratedKeys = true, keyProperty = "attendeeId", keyColumn = "attendee_id")
-    @Insert("Insert into attendees (attendee_name, email) values (#{attendeeName}, #{email});")
-    int createAttendee(Attendee attendee);
+    @ResultMap("attendeesMapper")
+    @Select("Insert into attendees (attendee_name, email) values (#{req.attendeeName}, #{req.email}) RETURNING *;")
+    Attendee createAttendee(@Param("req")AttendeeRequest attendee);
 
-    @Update("Update attendees set attendee_name = #{attendeeName}, email = #{email} where attendee_id = #{attendeeId};")
-    int updateAttendee(Attendee attendee);
+    @ResultMap("attendeesMapper")
+    @Select("Update attendees set attendee_name = #{req.attendeeName}, email = #{req.email} where attendee_id = #{attendeeId} RETURNING *;")
+    Attendee updateAttendee(Integer attendeeId ,@Param("req")AttendeeRequest attendee);
 
-    @Delete("Delete from attendees where attendee_id = #{attendeeId};")
-    int deleteAttendee(Integer attendeeId);
+    @ResultMap("attendeesMapper")
+    @Select("Delete from attendees where attendee_id = #{attendeeId} RETURNING *;")
+    Attendee deleteAttendee(Integer attendeeId);
 
-
-
+    @ResultMap("attendeesMapper")
+    @Select("Select * from attendees where email = #{email} LIMIT 1;")
+    Attendee getAttendeeByEmail(String email);
 }

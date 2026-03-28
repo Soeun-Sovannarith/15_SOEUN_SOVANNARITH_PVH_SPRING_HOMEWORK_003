@@ -35,58 +35,54 @@ public class AttendessServiceImpl implements AttendessService {
         if(attendee != null){
             return attendee;
         } else {
-            throw new ResourceNotFoundException("Attendee with id 18 not found");
+            throw new ResourceNotFoundException("Attendee with "+attendee.getAttendeeId()+" was not found");
         }
     }
 
     @Override
     public Attendee createAttendee(AttendeeRequest newAttendee) {
-        if(newAttendee == null || !StringUtils.hasText(newAttendee.getAttendeeName()) || !StringUtils.hasText(newAttendee.getEmail())){
-            throw new IllegalArgumentException("Attendee name and email are required");
-        }
-        Attendee conflict = attendessReposiory.getAttendeeByName(newAttendee.getAttendeeName());
-        if(conflict != null){
+
+        Attendee nameConflict = attendessReposiory.getAttendeeByName(newAttendee.getAttendeeName());
+        if (nameConflict != null) {
             throw new DuplicationException("Attendee name already exists");
         }
-        Attendee attendee = new Attendee();
-        attendee.setAttendeeName(newAttendee.getAttendeeName());
-        attendee.setEmail(newAttendee.getEmail());
-        int inserted = attendessReposiory.createAttendee(attendee);
-        if(inserted != 1){
-            throw new RuntimeException("Failed to create attendee");
+
+        Attendee emailConflict = attendessReposiory.getAttendeeByEmail(newAttendee.getEmail());
+        if (emailConflict != null) {
+            throw new DuplicationException("Attendee email already exists");
         }
-        return attendessReposiory.getAttendeeById(attendee.getAttendeeId());
+
+
+        return attendessReposiory.createAttendee(newAttendee);
     }
 
 
 
     @Override
     public Attendee updateAttendee(Integer attendeeId, AttendeeRequest attendeeRequest) {
-        if(attendeeRequest == null || !StringUtils.hasText(attendeeRequest.getAttendeeName()) || !StringUtils.hasText(attendeeRequest.getEmail())){
+        if (attendeeRequest == null) {
             throw new IllegalArgumentException("Attendee name and email are required");
         }
-        Attendee conflict = attendessReposiory.getAttendeeByName(attendeeRequest.getAttendeeName());
-        if(conflict != null && !conflict.getAttendeeId().equals(attendeeId)){
+        Attendee nameConflict = attendessReposiory.getAttendeeByName(attendeeRequest.getAttendeeName());
+        if (nameConflict != null && !nameConflict.getAttendeeId().equals(attendeeId)) {
             throw new DuplicationException("Attendee name already exists");
         }
-        Attendee attendee = getAttendeeById(attendeeId);
-        attendee.setAttendeeName(attendeeRequest.getAttendeeName());
-        attendee.setEmail(attendeeRequest.getEmail());
-        int updated = attendessReposiory.updateAttendee(attendee);
-        if(updated != 1){
-            throw new RuntimeException("Failed to update attendee");
+
+        Attendee emailConflict = attendessReposiory.getAttendeeByEmail(attendeeRequest.getEmail());
+        if (emailConflict != null && !emailConflict.getAttendeeId().equals(attendeeId)) {
+            throw new DuplicationException("Email is already exists");
         }
-        return attendessReposiory.getAttendeeById(attendeeId);
+
+        return attendessReposiory.updateAttendee(attendeeId, attendeeRequest);
     }
 
     @Override
     public Attendee deleteAttendee(Integer attendeeId) {
         Attendee existing = getAttendeeById(attendeeId);
-        int deleted = attendessReposiory.deleteAttendee(attendeeId);
-        if(deleted != 1){
-            throw new RuntimeException("Failed to delete attendee");
+        if(existing == null){
+            throw new ResourceNotFoundException("Attendee with id "+attendeeId+" was not found");
         }
-        return existing;
+        return attendessReposiory.deleteAttendee(attendeeId);
     }
 
 

@@ -12,8 +12,6 @@ public interface AttendessService {
 
     Attendee getAttendeeById(Integer attendeesId);
 
-
-
     Attendee updateAttendee(Integer attendeeId, AttendeeRequest attendee);
 
     Attendee deleteAttendee(Integer attendeeId);
