@@ -32,7 +32,7 @@ public class VenueServiceImpl implements VenueService {
         if (venue == null) {
             throw new ResourceNotFoundException("Venue with id " + venueId + " was not found");
         }
-        return venueRepository.getVenueById(venueId);
+        return venue;
     }
 
     @Override
@@ -53,7 +53,11 @@ public class VenueServiceImpl implements VenueService {
         if (nameConflict != null && !nameConflict.getVenueId().equals(venueId)) {
             throw new DuplicationException("Venue name already exists");
         }
-        return venueRepository.updateVenue(venueId, venueRequest);
+        Venue updated = venueRepository.updateVenue(venueId, venueRequest);
+        if (updated == null) {
+            throw new ResourceNotFoundException("Venue with id " + venueId + " was not found");
+        }
+        return updated;
     }
 
     @Override

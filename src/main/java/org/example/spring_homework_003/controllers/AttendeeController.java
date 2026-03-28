@@ -51,10 +51,7 @@ public class AttendeeController {
 
     @DeleteMapping("{attendeeId}")
     public ResponseEntity<Response<Attendee>> deleteAttendee(@PathVariable Integer attendeeId){
-        Attendee payload = attendessService.deleteAttendee(attendeeId);
-        if(payload != null){
-            return ResponseEntity.accepted().body(Response.ResponseSuccess("Deleted attendee successfully", "OK", null));
-        }
-        else throw new ResourceNotFoundException("Attendee with that id was found");
+        attendessService.deleteAttendee(attendeeId);
+        return ResponseEntity.accepted().body(Response.ResponseSuccess("Deleted attendee successfully", "OK", null));
     }
 }

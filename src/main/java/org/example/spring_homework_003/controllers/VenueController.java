@@ -50,7 +50,7 @@ public class VenueController {
 
     @DeleteMapping("{venueId}")
     public ResponseEntity<?> deleteVenue(@PathVariable Integer venueId){
-        Venue payload = venueService.deleteVenue(venueId);
-        return ResponseEntity.ok().body(Response.ResponseSuccess("Deleted venue successfully", "OK", payload));
+        venueService.deleteVenue(venueId);
+        return ResponseEntity.ok().body(Response.ResponseSuccess("Deleted venue successfully", "OK", null));
     }
 }

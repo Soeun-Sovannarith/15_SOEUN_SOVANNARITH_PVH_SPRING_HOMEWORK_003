@@ -35,7 +35,7 @@ public class AttendessServiceImpl implements AttendessService {
         if(attendee != null){
             return attendee;
         } else {
-            throw new ResourceNotFoundException("Attendee with "+attendee.getAttendeeId()+" was not found");
+            throw new ResourceNotFoundException("Attendee with id "+attendeeId+" was not found");
         }
     }
 
@@ -73,7 +73,11 @@ public class AttendessServiceImpl implements AttendessService {
             throw new DuplicationException("Email is already exists");
         }
 
-        return attendessReposiory.updateAttendee(attendeeId, attendeeRequest);
+        Attendee updated = attendessReposiory.updateAttendee(attendeeId, attendeeRequest);
+        if (updated == null) {
+            throw new ResourceNotFoundException("Attendee with id " + attendeeId + " was not found");
+        }
+        return updated;
     }
 
     @Override
