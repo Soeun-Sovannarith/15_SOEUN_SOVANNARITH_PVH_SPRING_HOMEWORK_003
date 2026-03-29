@@ -7,11 +7,14 @@ import org.example.spring_homework_003.services.EventService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Positive;
+import org.springframework.validation.annotation.Validated;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("api/v1/events")
+@Validated
 public class EventController {
 
     private final EventService eventService;
@@ -21,7 +24,9 @@ public class EventController {
     }
 
     @GetMapping()
-    public ResponseEntity<?> getAllEvents(@RequestParam(defaultValue = "1") Integer page, @RequestParam(defaultValue="10") Integer size){
+    public ResponseEntity<?> getAllEvents(
+            @RequestParam(defaultValue = "1") @Positive(message = "must be greater than 0") Integer page,
+            @RequestParam(defaultValue="10") @Positive(message = "must be greater than 0") Integer size){
         List<Event> payload = eventService.getAllEvents(page,size);
         return ResponseEntity.ok().body(Response.ResponseSuccess("Retrieved events successfully", "OK", payload));
     }

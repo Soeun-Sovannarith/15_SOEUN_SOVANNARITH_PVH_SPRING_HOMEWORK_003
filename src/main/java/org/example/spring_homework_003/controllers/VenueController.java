@@ -9,11 +9,14 @@ import org.example.spring_homework_003.services.VenueService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Positive;
+import org.springframework.validation.annotation.Validated;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("api/v1/venues")
+@Validated
 public class VenueController {
 
     private final VenueService venueService;
@@ -24,7 +27,9 @@ public class VenueController {
 
 
     @GetMapping()
-    public ResponseEntity<?> getAllVenues(@RequestParam(defaultValue = "1") Integer page, @RequestParam(defaultValue="10") Integer size){
+    public ResponseEntity<?> getAllVenues(
+            @RequestParam(defaultValue = "1") @Positive(message = "must be greater than 0") Integer page,
+            @RequestParam(defaultValue="10") @Positive(message = "must be greater than 0") Integer size){
         List<Venue> payload = venueService.getAllVenues(page,size);
         return ResponseEntity.ok().body(Response.ResponseSuccess("Retrieved venues successfully", "OK", payload));
     }

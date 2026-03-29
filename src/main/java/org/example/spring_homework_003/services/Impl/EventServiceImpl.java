@@ -6,6 +6,7 @@ import org.example.spring_homework_003.models.entity.Event;
 import org.example.spring_homework_003.models.request.EventRequest;
 import org.example.spring_homework_003.repositories.EventRepository;
 import org.example.spring_homework_003.services.EventService;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -41,12 +42,17 @@ public class EventServiceImpl implements EventService {
         if (nameConflict != null) {
             throw new DuplicationException("Event name already exists");
         }
-        Event createdEvent = eventRepository.createEvent(newEvent);
 
-        if (newEvent.getAttendeeIds() != null && !newEvent.getAttendeeIds().isEmpty()) {
-            eventRepository.insertEventAttendees(createdEvent.getEventId(), newEvent.getAttendeeIds());
+        try {
+            Event createdEvent = eventRepository.createEvent(newEvent);
+
+            if (newEvent.getAttendeeIds() != null && !newEvent.getAttendeeIds().isEmpty()) {
+                eventRepository.insertEventAttendees(createdEvent.getEventId(), newEvent.getAttendeeIds());
+            }
+            return eventRepository.getEventById(createdEvent.getEventId());
+        } catch (DataIntegrityViolationException e) {
+            throw new ResourceNotFoundException("One or more provided Attendee IDs or Venue ID do not exist");
         }
-        return eventRepository.getEventById(createdEvent.getEventId());
     }
 
     @Override
@@ -58,19 +64,24 @@ public class EventServiceImpl implements EventService {
         if (nameConflict != null && !nameConflict.getEventId().equals(eventId)) {
             throw new DuplicationException("Event name already exists");
         }
-        Event updated = eventRepository.updateEvent(eventId, eventRequest);
-        if (updated == null) {
-            throw new ResourceNotFoundException("Event with id " + eventId + " was not found");
-        }
 
-        if (eventRequest.getAttendeeIds() != null) {
-            eventRepository.deleteEventAttendees(eventId);
-            if (!eventRequest.getAttendeeIds().isEmpty()) {
-                eventRepository.insertEventAttendees(eventId, eventRequest.getAttendeeIds());
+        try {
+            Event updated = eventRepository.updateEvent(eventId, eventRequest);
+            if (updated == null) {
+                throw new ResourceNotFoundException("Event with id " + eventId + " was not found");
             }
-        }
 
-        return eventRepository.getEventById(eventId);
+            if (eventRequest.getAttendeeIds() != null) {
+                eventRepository.deleteEventAttendees(eventId);
+                if (!eventRequest.getAttendeeIds().isEmpty()) {
+                    eventRepository.insertEventAttendees(eventId, eventRequest.getAttendeeIds());
+                }
+            }
+
+            return eventRepository.getEventById(eventId);
+        } catch (DataIntegrityViolationException e) {
+            throw new ResourceNotFoundException("One or more provided Attendee IDs or Venue ID do not exist");
+        }
     }
 
     @Override

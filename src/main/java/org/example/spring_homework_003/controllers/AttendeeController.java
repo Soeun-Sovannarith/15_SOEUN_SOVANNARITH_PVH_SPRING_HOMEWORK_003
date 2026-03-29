@@ -9,11 +9,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Positive;
+import org.springframework.validation.annotation.Validated;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("api/v1/attendee")
+@Validated
 public class AttendeeController {
     private final AttendessService attendessService;
 
@@ -24,7 +27,9 @@ public class AttendeeController {
 
 
     @GetMapping()
-    public ResponseEntity<?> getAllAttendess(@RequestParam(defaultValue = "1") Integer page, @RequestParam(defaultValue="10") Integer size){
+    public ResponseEntity<?> getAllAttendess(
+            @RequestParam(defaultValue = "1") @Positive(message = "must be greater than 0") Integer page,
+            @RequestParam(defaultValue="10") @Positive(message = "must be greater than 0") Integer size){
         List<Attendee> payload =attendessService.getAllAttendess(page,size);
         return ResponseEntity.accepted().body(Response.ResponseSuccess("Retrieved attendees successfully", "OK",payload));
     }
