@@ -32,7 +32,7 @@ public class EventController {
     }
 
     @GetMapping("{eventId}")
-    public ResponseEntity<?> getEventById(@PathVariable Integer eventId){
+    public ResponseEntity<?> getEventById(@PathVariable @Positive(message = "must be greater than 0") Integer eventId){
         Event payload = eventService.getEventById(eventId);
         return ResponseEntity.ok().body(Response.ResponseSuccess("Retrieved event successfully", "OK", payload));
     }
@@ -44,13 +44,13 @@ public class EventController {
     }
 
     @PutMapping("{eventId}")
-    public ResponseEntity<?> updateEvent(@PathVariable Integer eventId, @Valid @RequestBody EventRequest eventRequest){
+    public ResponseEntity<?> updateEvent(@PathVariable @Positive(message = "must be greater than 0") Integer eventId, @Valid @RequestBody EventRequest eventRequest){
         Event payload = eventService.updateEvent(eventId, eventRequest);
         return ResponseEntity.ok().body(Response.ResponseSuccess("Updated event successfully", "OK", payload));
     }
 
     @DeleteMapping("{eventId}")
-    public ResponseEntity<?> deleteEvent(@PathVariable Integer eventId){
+    public ResponseEntity<?> deleteEvent(@PathVariable @Positive(message = "must be greater than 0") Integer eventId){
         eventService.deleteEvent(eventId);
         return ResponseEntity.ok().body(Response.ResponseSuccess("Deleted event successfully", "OK", null));
     }

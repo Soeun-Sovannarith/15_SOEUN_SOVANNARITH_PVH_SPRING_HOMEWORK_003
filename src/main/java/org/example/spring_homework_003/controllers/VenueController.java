@@ -36,7 +36,7 @@ public class VenueController {
 
 
     @GetMapping("{venueId}")
-    public ResponseEntity<?> getVenueById(@PathVariable Integer venueId){
+    public ResponseEntity<?> getVenueById(@PathVariable @Positive(message = "must be greater than 0") Integer venueId){
         Venue payload = venueService.getVenueById(venueId);
         return ResponseEntity.ok().body(Response.ResponseSuccess("Retrieved venue successfully", "OK", payload));
     }
@@ -48,13 +48,13 @@ public class VenueController {
     }
 
     @PutMapping("{venueId}")
-    public ResponseEntity<?> updateVenue(@PathVariable Integer venueId, @Valid @RequestBody VenueRequest venueRequest){
+    public ResponseEntity<?> updateVenue(@PathVariable @Positive(message = "must be greater than 0") Integer venueId, @Valid @RequestBody VenueRequest venueRequest){
         Venue payload = venueService.updateVenue(venueId, venueRequest);
         return ResponseEntity.ok().body(Response.ResponseSuccess("Updated venue successfully", "OK", payload));
     }
 
     @DeleteMapping("{venueId}")
-    public ResponseEntity<?> deleteVenue(@PathVariable Integer venueId){
+    public ResponseEntity<?> deleteVenue(@PathVariable @Positive(message = "must be greater than 0") Integer venueId){
         venueService.deleteVenue(venueId);
         return ResponseEntity.ok().body(Response.ResponseSuccess("Deleted venue successfully", "OK", null));
     }

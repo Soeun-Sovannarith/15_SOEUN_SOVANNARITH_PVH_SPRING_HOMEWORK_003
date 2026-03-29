@@ -35,7 +35,7 @@ public class AttendeeController {
     }
 
     @GetMapping("{attendeeId}")
-    public ResponseEntity<Response<Attendee>> getAttendeeById(@PathVariable Integer attendeeId){
+    public ResponseEntity<Response<Attendee>> getAttendeeById(@PathVariable @Positive(message = "must be greater than 0") Integer attendeeId){
         Attendee payload = attendessService.getAttendeeById(attendeeId);
         return ResponseEntity.accepted().body(Response.ResponseSuccess("Retrieved attendee with id 1 successfully", "OK", payload));
 
@@ -48,14 +48,14 @@ public class AttendeeController {
     }
 
     @PutMapping("{attendeeId}")
-    public ResponseEntity<Response<Attendee>> updateAttendee(@PathVariable Integer attendeeId, @Valid @RequestBody AttendeeRequest attendee){
+    public ResponseEntity<Response<Attendee>> updateAttendee(@PathVariable @Positive(message = "must be greater than 0") Integer attendeeId, @Valid @RequestBody AttendeeRequest attendee){
         Attendee payload = attendessService.updateAttendee(attendeeId, attendee);
         return ResponseEntity.accepted().body(Response.ResponseSuccess("Updated attendee successfully", "OK", payload));
 
     }
 
     @DeleteMapping("{attendeeId}")
-    public ResponseEntity<Response<Attendee>> deleteAttendee(@PathVariable Integer attendeeId){
+    public ResponseEntity<Response<Attendee>> deleteAttendee(@PathVariable @Positive(message = "must be greater than 0") Integer attendeeId){
         attendessService.deleteAttendee(attendeeId);
         return ResponseEntity.accepted().body(Response.ResponseSuccess("Deleted attendee successfully", "OK", null));
     }
